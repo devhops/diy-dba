@@ -40,17 +40,46 @@ Model.new(:my_backup, 'Description for my_backup') do
   end
 
   ##
-  # Local (Copy) [Storage]
+  # MySQL [Database]
   #
-  store_with Local do |local|
-    local.path       = "~/backups/"
-    local.keep       = 5
+  database MySQL do |db|
+    # To dump all databases, set `db.name = :all` (or leave blank)
+    db.name               = "db_name"
+    db.username           = "db_pass"
+    db.password           = "password"
+    db.host               = "server.name.co.uk"
+    db.port               = 3306
+    db.socket             = "/tmp/mysql.sock"
+    # Note: when using `skip_tables` with the `db.name = :all` option,
+    # table names should be prefixed with a database name.
+    # e.g. ["db_name.table_to_skip", ...]
+    db.skip_tables        = ["skip", "these", "tables"]
+    db.only_tables        = ["only", "these", "tables"]
+    db.additional_options = ["--create-options", "--single-transaction"]
   end
 
   ##
-  # Gzip [Compressor]
+  # RSync [Storage]
   #
-  compress_with Gzip
+  # The default `mode` is :ssh, which does not require the use
+  # of an rsync daemon on the remote. If you wish to connect
+  # directly to an rsync daemon, or via SSH using daemon features,
+  # :rsync_daemon and :ssh_daemon modes are also available.
+  #
+  # If no `host` is specified, the transfer will be a local
+  # operation. `mode` and `compress` will have no meaning.
+  #
+  store_with RSync do |rsync|
+    rsync.mode      = :ssh
+    rsync.host      = "127.0.0.1"
+    rsync.path      = "/sarah-db-diy"
+    rsync.compress  = true
+  end
+
+  ##
+  # Bzip2 [Compressor]
+  #
+  compress_with Bzip2
 
   ##
   # Mail [Notifier]
@@ -63,13 +92,13 @@ Model.new(:my_backup, 'Description for my_backup') do
     mail.on_warning           = true
     mail.on_failure           = true
 
-    mail.from                 = "sender@email.com"
-    mail.to                   = "receiver@email.com"
-    mail.address              = "smtp.gmail.com"
+    mail.from                 = "sarah@devhops.co.uk"
+    mail.to                   = "sarah@devhops.co.uk"
+    mail.address              = "localhost"
     mail.port                 = 587
-    mail.domain               = "your.host.name"
-    mail.user_name            = "sender@email.com"
-    mail.password             = "my_password"
+    mail.domain               = "devhops.co.uk"
+    mail.user_name            = "sarah@devhops.co.uk"
+    mail.password             = "youmustthinkimstupid"
     mail.authentication       = "plain"
     mail.encryption           = :starttls
   end
