@@ -9,3 +9,8 @@ Made using the backup gem
 
 gem install backup
 apt-get install ruby1.9.1-dev
+
+Running
+======
+
+backup perform --trigger my_backup
